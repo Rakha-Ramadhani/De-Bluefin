@@ -1,4 +1,5 @@
 {
 	"logo-directory": "/usr/share/ublue-os/bluefin-logos/symbols",
-	"shuffle-logo": true
+	"shuffle-logo": false,
+	"fastfetch-config": "/usr/share/ublue-os/fastfetch.jsonc"
 }
