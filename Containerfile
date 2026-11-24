@@ -112,5 +112,17 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
 RUN rm -rf /opt && ln -s /var/opt /opt
 
 CMD ["/sbin/init"]
+# --- TARUH DI BAGIAN AKHIR CONTAINERFILE (SEBELUM LINTING) ---
+RUN dnf5 swap -y bluefin-logos fedora-logos && \
+    plymouth-set-default-theme bgrt && \
+    dracut --force --regenerate-all && \
+    sed -i -e 's/^NAME=.*/NAME="Fedora Linux"/' \
+           -e 's/^PRETTY_NAME=.*/PRETTY_NAME="Fedora Linux (Silverblue)"/' \
+           -e 's/^ID=.*/ID=fedora/' \
+           -e 's/^LOGO=.*/LOGO=fedora-logo-icon/' \
+           -e 's/^VARIANT=.*/VARIANT="Silverblue"/' \
+           -e 's/^VARIANT_ID=.*/VARIANT_ID=silverblue/' \
+           -e '/^HOME_URL=/c\HOME_URL="https://fedoraproject.org"' \
+           /usr/lib/os-release
 
 RUN bootc container lint
