@@ -1,6 +1,6 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
-echo "::group:: ===$(basename "$0")==="
+echo "::group::===$(basename "$0")==="
 
 set -eoux pipefail
 
@@ -13,8 +13,8 @@ if [[ "${IMAGE_FLAVOR}" != "dx" ]]; then
     # Installs the OS-managed Homebrew packages (ChairLift) at login. A user
     # preset is not applied to existing users, so enable it globally.
     systemctl --global enable brew-preinstall.service
-    # Compass is installed by brew-preinstall on non-DX images. A user preset
-    # is not applied to existing users, so enable its unit globally too.
+    # Compass is installed by brew-preinstall on non-DX
+    # images only. A user preset is not applied to existing users, so enable its unit globally too.
     systemctl --global enable compass.service
     # The ChairLift icons come from system_files; refresh the hicolor cache so
     # users without the cask's ~/.local copy (everyone but UID 1000) see them.
@@ -23,7 +23,9 @@ fi
 systemctl enable brew-setup.service
 systemctl enable dconf-update.service
 systemctl enable flatpak-nuke-fedora.service
-systemctl enable input-remapper.service
+if [[ -f /usr/lib/systemd/system/input-remapper.service ]]; then
+    systemctl enable input-remapper.service
+fi
 systemctl enable rpm-ostree-countme.service
 systemctl enable tailscaled.service
 systemctl enable ublue-system-setup.service
@@ -43,7 +45,7 @@ for file in fish htop nvtop; do
     fi
 done
 
-#Add the Flathub Flatpak remote and remove the Fedora Flatpak remote
+#Add the FlatHub Flatpak remote and remove the Fedora Flatpak remote
 flatpak remote-add --system --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 systemctl disable flatpak-add-fedora-repos.service
 
@@ -61,7 +63,7 @@ for repo in negativo17-fedora-multimedia tailscale fedora-cisco-openh264; do
 done
 
 # Disable all COPR repos (should already be disabled by helpers, but ensure)
-for i in /etc/yum.repos.d/_copr:*.repo; do
+for i in /etc/yum.repos.d/_copr:* .repo; do
     if [[ -f "$i" ]]; then
         sed -i 's@enabled=1@enabled=0@g' "$i"
     fi
